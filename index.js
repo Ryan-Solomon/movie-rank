@@ -5,21 +5,32 @@ const fetchData = async (searchTerm) => {
       s: searchTerm,
     },
   });
+
+  if (response.data.Error) {
+    return [];
+  }
+
+  return response.data.Search;
 };
 
 const input = document.querySelector('input');
 
-const debounce = (fn, delay = 500) => {
-  let timoutId;
-  function debounceified(...args) {
-    if (timoutId) {
-      clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(() => fn(...args), delay);
-  }
-  return debounceified;
+const onInput = async (e) => {
+  const movies = await fetchData(e.target.value);
+
+  if (movies.length < 1) return;
+
+  movies.map((movie) => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+    <img src="${movie.Poster}" />
+    <h1>${movie.Title}</h1>
+    
+    `;
+
+    const targetEle = document.querySelector('#target');
+    targetEle.appendChild(div);
+  });
 };
 
-const onInput = debounce((e) => fetchData(e.target.value));
-
-input.addEventListener('input', onInput);
+input.addEventListener('input', debounce(onInput));
